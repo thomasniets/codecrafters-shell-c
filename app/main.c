@@ -7,12 +7,12 @@ static char *find_exec(char *path, char *cmd)
 {
 	char *res = malloc(1024);
 	char *string = strdup(path);
-	printf("path: %s\n", string);
+	// printf("path: %s\n", string);
 	char *token = strtok(string, ":");
 	while (token != NULL)
 	{
 		snprintf(res, 1024, "%s/%s", token, cmd);
-		printf("checking: %s\n", res);
+		// printf("checking: %s\n", res);
 		if (access(res, X_OK) == 0)
 		{
 			free(string);
