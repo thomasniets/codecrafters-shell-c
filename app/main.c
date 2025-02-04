@@ -7,7 +7,7 @@ static void type_builtin(char *input)
   if (!strcmp(&input[5], "echo") || !strcmp(&input[5], "exit") || !strcmp(&input[5], "type"))
     printf("%s is a shell builtin\n", &input[5]);
   else
-    printf("%s: command not found\n", &input[5]);
+    printf("%s: not found\n", &input[5]);
 }
 
 int main() {
