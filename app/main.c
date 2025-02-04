@@ -5,25 +5,21 @@
 
 static char *find_exec(char *path, char *cmd)
 {
-	char *res;
+	char *res = malloc(1024);
 	char *string = strdup(path);
+	printf("path: %s\n", string);
 	char *token = strtok(string, ":");
 	while (token != NULL)
 	{
-		res = strdup(token);
-		strcat(res, "/");
-		strcat(res, cmd);
-		// printf( "checking: %s\n", res);
+		snprintf(res, 1024, "%s/%s", token, cmd);
+		printf("checking: %s\n", res);
 		if (access(res, X_OK) == 0)
 		{
 			free(string);
-			free(token);
 			return (res);
 		}
-		token = strtok(NULL, " ");
-		free(res);
+		token = strtok(NULL, ":");
 	}
-	free(token);
 	free(string);
 	return (NULL);
 }
