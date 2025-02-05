@@ -88,7 +88,6 @@ static int check_cmd(char *input)
     argv[i] = NULL;
     if (!argv[0])
         return (1);
-    // printf("cmd: %s\n", argv[0]);
     pid = fork();
     if (pid < 0)
     {
@@ -98,15 +97,15 @@ static int check_cmd(char *input)
     if (pid == 0)
     {
         if (execvp(argv[0], argv) == -1)
-			return (1);
-        // perror("execvp failed");
-        // exit(1);
+			_exit(1);
+			// return (1);
     }
     else
     {
-        waitpid(pid, NULL, 0);
-        // printf("child is done\n");
-		kill(pid, 3);
+		int status;
+        waitpid(pid, &status, 0);
+		if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
+            return (1);
         return (0);
     }
 	return(1);
@@ -147,10 +146,8 @@ int main()
 				printf("%s\n", &input[5]);
 			else if (strncmp(input, "type ", 5) == 0)
 				type_builtin(input, path);
-			// else if (check_cmd(input, path) == 1)
 			else if (check_cmd(input) == 1)
 				printf("%s: command not found\n", input);
-			// else
 		}
 	}
 	return (0);
