@@ -86,7 +86,7 @@ static void type_builtin(char *input, char *path)
 static void change_dir(char *new)
 {
 	if (chdir(new) == -1)
-		printf("cd: %s No such file or directory\n", new);
+		printf("cd: %s: No such file or directory\n", new);
 }
 
 int main()
