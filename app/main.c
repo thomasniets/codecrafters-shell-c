@@ -114,10 +114,19 @@ static int check_cmd(char *input)
 static void type_builtin(char *input, char *path)
 {
 	char *cmd = &input[5];
+	char **builtins = {"echo", "exit", "type", "pwd", "cd"};
+	int i = 0;
+	while (i < 5)
+	{
+		if (!strcmp(cmd, builtins[i]))
+		{
+			printf("%s is a shell builtin\n", cmd);
+			return ;
+		}
+		i++;
+	}
 	char *res = find_exec(path, cmd);
-	if (!strcmp(cmd, "echo") || !strcmp(cmd, "exit") || !strcmp(cmd, "type") || !strcmp(cmd, "pwd"))
-		printf("%s is a shell builtin\n", cmd);
-	else if (res)
+	if (res)
 		printf("%s is %s\n", cmd, res);
 	else
 		printf("%s: not found\n", cmd);
