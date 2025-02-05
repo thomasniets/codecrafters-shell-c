@@ -85,8 +85,22 @@ static void type_builtin(char *input, char *path)
 
 static void change_dir(char *new)
 {
-	if (chdir(new) == -1)
-		printf("cd: %s: No such file or directory\n", new);
+	if (!strncmp("~", new, 2))
+	{
+		char *home = getenv("HOME");
+		if (!home)
+		{
+			fprintf(stderr, "Error: HOME not set\n");
+			exit(1);
+		}
+		if (chdir(home) == -1)
+			printf("cd: %s: No such file or directory\n", home);
+	}
+	else
+	{
+		if (chdir(new) == -1)
+			printf("cd: %s: No such file or directory\n", new);
+	}
 }
 
 int main()
