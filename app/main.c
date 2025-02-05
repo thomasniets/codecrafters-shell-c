@@ -5,8 +5,6 @@
 #include <ctype.h>
 #include <signal.h>
 
-extern char **environ;
-
 static char *find_exec(char *path, char *cmd)
 {
 	char *res = malloc(1024);
@@ -26,52 +24,6 @@ static char *find_exec(char *path, char *cmd)
 	free(string);
 	return (NULL);
 }
-
-// static int check_cmd(char *input, char *path)
-// {
-// 	char *cmd;
-// 	pid_t	pid;
-// 	int i = 0;
-// 	while (input[i] && !isspace(input[i]))
-// 		i++;
-// 	int len = i + 1;
-// 	cmd = malloc(len);
-// 	strlcpy(cmd, input, len);
-// 	printf("cmd: %s\n", cmd);
-// 	char *res = find_exec(path, cmd);
-// 	if (!res)
-// 	{
-// 		free(cmd);
-// 		return(1);
-// 	}
-// 	else
-// 	{
-// 		printf("res: %s\n", res);
-// 		printf("input: %s\n", input);
-// 		pid = fork();
-// 		if (pid < 0)
-// 		{
-// 			free(cmd);
-// 			free(res);
-// 			perror("Fork error");
-// 			return(1);
-// 		}
-// 		if (pid == 0)
-// 		{
-// 			printf("i'm child\n");
-// 			execve(res, input, environ);
-// 		}
-// 		else
-// 		{
-// 			waitpid(pid, NULL, 0);
-// 			printf("child is done\n");
-// 			free(cmd);
-// 			free(res);
-// 			return(0);
-// 		}
-// 	}
-// 	return(1);
-// }
 
 static int check_cmd(char *input)
 {
@@ -98,7 +50,6 @@ static int check_cmd(char *input)
     {
         if (execvp(argv[0], argv) == -1)
 			_exit(1);
-			// return (1);
     }
     else
     {
@@ -114,7 +65,7 @@ static int check_cmd(char *input)
 static void type_builtin(char *input, char *path)
 {
 	char *cmd = &input[5];
-	char **builtins = {"echo", "exit", "type", "pwd", "cd"};
+	char *builtins[5] = {"echo", "exit", "type", "pwd", "cd"};
 	int i = 0;
 	while (i < 5)
 	{
@@ -130,6 +81,12 @@ static void type_builtin(char *input, char *path)
 		printf("%s is %s\n", cmd, res);
 	else
 		printf("%s: not found\n", cmd);
+}
+
+static void change_dir(char *new)
+{
+	if (chdir(new) == -1)
+		printf("cd: %s No such file or directory\n", new);
 }
 
 int main()
@@ -149,13 +106,15 @@ int main()
 		if (input[0] != '\n')
 		{
 			input[strlen(input) - 1] = '\0';
-			if (strcmp(input, "exit 0") == 0)
+			if (!strcmp(input, "exit 0"))
 				exit(0);
-			else if (strncmp(input, "echo ", 5) == 0)
+			else if (!strncmp(input, "echo ", 5))
 				printf("%s\n", &input[5]);
-			else if (strcmp(input, "pwd") == 0)
+			else if (!strcmp(input, "pwd"))
 				printf("%s\n", getcwd(NULL, 1));
-			else if (strncmp(input, "type ", 5) == 0)
+			else if (!strncmp(input, "cd ", 3))
+				change_dir(&input[3]);
+			else if (!strncmp(input, "type ", 5))
 				type_builtin(input, path);
 			else if (check_cmd(input) == 1)
 				printf("%s: command not found\n", input);
