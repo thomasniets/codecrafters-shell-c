@@ -1,9 +1,7 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <ctype.h>
-#include <signal.h>
+#include "header.h"
+
+static char *builtins[5] = {"echo", "exit", "type", "pwd", "cd"};
+static int num_builtins = 5;
 
 static char *find_exec(char *path, char *cmd)
 {
@@ -25,21 +23,13 @@ static char *find_exec(char *path, char *cmd)
 	return (NULL);
 }
 
-static int check_cmd(char *input)
+static int fork_execvp(char *input)
 {
     pid_t pid;
     char *cmd;
-    char *argv[20];
-    char *token = strtok(input, " ");
-    int i = 0;
-    while (token && i < 19)
-    {
-        argv[i++] = token;
-        token = strtok(NULL, " ");
-    }
-    argv[i] = NULL;
-    if (!argv[0])
-        return (1);
+	char *args[MAX_TOKENS];
+	if (tokenize(input, args) == -1)
+		return(1);
     pid = fork();
     if (pid < 0)
     {
@@ -48,7 +38,7 @@ static int check_cmd(char *input)
     }
     if (pid == 0)
     {
-        if (execvp(argv[0], argv) == -1)
+        if (execvp(args[0], args) == -1)
 			_exit(1);
     }
     else
@@ -62,12 +52,26 @@ static int check_cmd(char *input)
 	return(1);
 }
 
+static void echo_builtin(char *input)
+{
+	char *args[MAX_TOKENS];
+	int i = 1;
+	int args_num = tokenize(input, args);
+	if (args_num == -1)
+		return ;
+	while (i < args_num - 1)
+	{
+		printf("%s ", args[i]);
+		i++;
+	}
+	printf("%s\n", args[i]);
+}
+
 static void type_builtin(char *input, char *path)
 {
 	char *cmd = &input[5];
-	char *builtins[5] = {"echo", "exit", "type", "pwd", "cd"};
 	int i = 0;
-	while (i < 5)
+	while (i < num_builtins)
 	{
 		if (!strcmp(cmd, builtins[i]))
 		{
@@ -122,15 +126,15 @@ int main()
 			input[strlen(input) - 1] = '\0';
 			if (!strcmp(input, "exit 0"))
 				exit(0);
-			else if (!strncmp(input, "echo ", 5))
-				printf("%s\n", &input[5]);
+			else if (!strncmp(input, "echo ", 5)) //needs tokenisation
+				echo_builtin(input);
 			else if (!strcmp(input, "pwd"))
 				printf("%s\n", getcwd(NULL, 1));
 			else if (!strncmp(input, "cd ", 3))
 				change_dir(&input[3]);
 			else if (!strncmp(input, "type ", 5))
 				type_builtin(input, path);
-			else if (check_cmd(input) == 1)
+			else if (fork_execvp(input) == 1) //needs tokenisation
 				printf("%s: command not found\n", input);
 		}
 	}
