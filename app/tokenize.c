@@ -24,7 +24,7 @@ static char *extract_unquoted(char *str)
     return (current);
 }
 
-int tokenize(char *input, char **args)
+int tokenize_for_echo(char *input, char **args)
 {
 	//probably better to make a copy of input before modifying it directly
 	char *token_start;
@@ -42,6 +42,45 @@ int tokenize(char *input, char **args)
 			args[token_num] = strdup(" ");
 			token_num++;
 		}
+        if (*pos == '\0')
+            break ;
+        token_start = pos;
+        if (*pos == '\'' || *pos == '"')
+		{
+            quote_type = *pos;
+            pos = extract_quoted(pos, quote_type);
+            token_start++;
+			args[token_num] = strndup(token_start, pos - token_start - 1);
+        }
+		else
+		{
+            pos = extract_unquoted(pos);
+			args[token_num] = strndup(token_start, pos - token_start);
+		}
+		//will also save empty '' or "" token (important for echo)
+        if (!args[token_num])
+		{
+			printf("strndup error\n");
+            return (-1);
+		}
+        token_num++;
+    }
+    args[token_num] = NULL;
+    return (token_num);
+}
+
+
+int tokenize(char *input, char **args)
+{
+	//probably better to make a copy of input before modifying it directly
+	char *token_start;
+	char quote_type;
+    int token_num = 0;
+    char *pos = input;
+    char *new_pos;
+    while (*pos != '\0')
+	{
+        pos = skip_whitespace(pos);
         if (*pos == '\0')
             break ;
         token_start = pos;

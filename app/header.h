@@ -10,3 +10,4 @@
 #define MAX_TOKENS 100
 
 int tokenize(char *input, char **args);
+int tokenize_for_echo(char *input, char **args);

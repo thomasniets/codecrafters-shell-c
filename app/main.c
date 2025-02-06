@@ -56,7 +56,7 @@ static void echo_builtin(char *input)
 {
 	char *args[MAX_TOKENS];
 	int i = 2; //skip echo itself and first space
-	int args_num = tokenize(input, args);
+	int args_num = tokenize_for_echo(input, args);
 	if (args_num == -1)
 		return ;
 	while (i < args_num - 1)
