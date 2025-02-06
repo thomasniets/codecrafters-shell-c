@@ -55,13 +55,13 @@ static int fork_execvp(char *input)
 static void echo_builtin(char *input)
 {
 	char *args[MAX_TOKENS];
-	int i = 1;
+	int i = 2; //skip echo itself and first space
 	int args_num = tokenize(input, args);
 	if (args_num == -1)
 		return ;
 	while (i < args_num - 1)
 	{
-		printf("%s ", args[i]);
+		printf("%s", args[i]); //spaces saved as arguments
 		i++;
 	}
 	printf("%s\n", args[i]); //-n option not handled

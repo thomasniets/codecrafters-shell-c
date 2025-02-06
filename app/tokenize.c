@@ -2,7 +2,7 @@
 
 static char *skip_whitespace(char *str)
 {
-    while (isspace(*str))
+    while (*str && isspace(*str))
         str++;
     return (str);
 }
@@ -12,11 +12,7 @@ static char *extract_quoted(char *str, char quote_type) {
     while (*current != quote_type && *current != '\0')
         current++;
     if (*current == quote_type)
-	{
-        // *current = '\0';
-		 //will yield extra \0
         return (current + 1);
-    }
     return (NULL);
 }
 
@@ -35,9 +31,17 @@ int tokenize(char *input, char **args)
 	char quote_type;
     int token_num = 0;
     char *pos = input;
+    char *new_pos;
+	pos = skip_whitespace(pos);
     while (*pos != '\0')
 	{
-        pos = skip_whitespace(pos);
+        new_pos = skip_whitespace(pos);
+		if (new_pos != pos)
+		{
+			pos = new_pos;
+			args[token_num] = strdup(" ");
+			token_num++;
+		}
         if (*pos == '\0')
             break ;
         token_start = pos;
@@ -53,8 +57,7 @@ int tokenize(char *input, char **args)
             pos = extract_unquoted(pos);
 			args[token_num] = strndup(token_start, pos - token_start);
 		}
-		//will also save empty '' or "" token (important for echo) 
-		// args[token_num] = strndup(token_start, pos - token_start);
+		//will also save empty '' or "" token (important for echo)
         if (!args[token_num])
 		{
 			printf("strndup error\n");
