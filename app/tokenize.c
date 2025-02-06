@@ -13,7 +13,8 @@ static char *extract_quoted(char *str, char quote_type) {
         current++;
     if (*current == quote_type)
 	{
-        *current = '\0'; //will yield extra \0
+        // *current = '\0';
+		 //will yield extra \0
         return (current + 1);
     }
     return (NULL);
@@ -45,11 +46,15 @@ int tokenize(char *input, char **args)
             quote_type = *pos;
             pos = extract_quoted(pos, quote_type);
             token_start++;
+			args[token_num] = strndup(token_start, pos - token_start - 1);
         }
 		else
+		{
             pos = extract_unquoted(pos);
+			args[token_num] = strndup(token_start, pos - token_start);
+		}
 		//will also save empty '' or "" token (important for echo) 
-		args[token_num] = strndup(token_start, pos - token_start);
+		// args[token_num] = strndup(token_start, pos - token_start);
         if (!args[token_num])
 		{
 			printf("strndup error\n");

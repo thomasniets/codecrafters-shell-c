@@ -64,7 +64,7 @@ static void echo_builtin(char *input)
 		printf("%s ", args[i]);
 		i++;
 	}
-	printf("%s\n", args[i]);
+	printf("%s\n", args[i]); //-n option not handled
 }
 
 static void type_builtin(char *input, char *path)
