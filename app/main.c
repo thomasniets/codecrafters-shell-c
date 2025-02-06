@@ -25,43 +25,43 @@ static char *find_exec(char *path, char *cmd)
 
 static int fork_execvp(char *input)
 {
-    pid_t pid;
-    char *cmd;
+	pid_t pid;
+	char *cmd;
 	char *args[MAX_TOKENS];
 	if (tokenize(input, args) == -1)
-		return(1);
-    pid = fork();
-    if (pid < 0)
-    {
-        perror("Fork error");
-        return (1);
-    }
-    if (pid == 0)
-    {
-        if (execvp(args[0], args) == -1)
+		return (1);
+	pid = fork();
+	if (pid < 0)
+	{
+		perror("Fork error");
+		return (1);
+	}
+	if (pid == 0)
+	{
+		if (execvp(args[0], args) == -1)
 			_exit(1);
-    }
-    else
-    {
+	}
+	else
+	{
 		int status;
-        waitpid(pid, &status, 0);
+		waitpid(pid, &status, 0);
 		if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
-            return (1);
-        return (0);
-    }
-	return(1);
+			return (1);
+		return (0);
+	}
+	return (1);
 }
 
 static void echo_builtin(char *input)
 {
 	char *args[MAX_TOKENS];
-	int i = 2; //skip echo itself and first space
+	int i = 2; // skip echo itself and first space
 	int args_num = tokenize_for_echo(input, args);
 	if (args_num == -1)
-		return ;
+		return;
 	while (i < args_num - 1)
 	{
-		printf("%s", args[i]); //spaces saved as arguments
+		printf("%s", args[i]); // spaces saved as arguments
 		i++;
 	}
 	printf("%s\n", args[i]); //-n option not handled
@@ -76,7 +76,7 @@ static void type_builtin(char *input, char *path)
 		if (!strcmp(cmd, builtins[i]))
 		{
 			printf("%s is a shell builtin\n", cmd);
-			return ;
+			return;
 		}
 		i++;
 	}
@@ -126,7 +126,7 @@ int main()
 			input[strlen(input) - 1] = '\0';
 			if (!strcmp(input, "exit 0"))
 				exit(0);
-			else if (!strncmp(input, "echo ", 5)) //needs tokenisation
+			else if (!strncmp(input, "echo ", 5)) // needs tokenisation
 				echo_builtin(input);
 			else if (!strcmp(input, "pwd"))
 				printf("%s\n", getcwd(NULL, 1));
@@ -134,7 +134,7 @@ int main()
 				change_dir(&input[3]);
 			else if (!strncmp(input, "type ", 5))
 				type_builtin(input, path);
-			else if (fork_execvp(input) == 1) //needs tokenisation
+			else if (fork_execvp(input) == 1) // needs tokenisation
 				printf("%s: command not found\n", input);
 		}
 	}
